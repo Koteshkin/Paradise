@@ -437,15 +437,17 @@
 	else
 		to_chat(user, "<span class='cultitalic'>In a brilliant flash of red, [L] falls to the ground!</span>")
 		// These are in life cycles, so double the time that's stated.
-		L.Weaken(5)
-		L.Stun(5)
+		L.Weaken(2)
+		L.Stun(2)
+		L.adjustStaminaLoss(30)
+		L.apply_status_effect(STATUS_EFFECT_STAMINADOT)
 		L.flash_eyes(1, TRUE)
 		if(issilicon(target))
 			var/mob/living/silicon/S = L
 			S.emp_act(EMP_HEAVY)
 		else if(iscarbon(target))
 			var/mob/living/carbon/C = L
-			C.Silence(3)
+			C.Silence(5)
 			C.Stuttering(8)
 			C.CultSlur(10)
 			C.Jitter(8)
@@ -524,7 +526,10 @@
 	if(iscarbon(target) && proximity)
 		var/mob/living/carbon/C = target
 		if(C.canBeHandcuffed() || C.get_arm_ignore())
-			CuffAttack(C, user)
+			if(C.getStaminaLoss() > 90 || C.health <= HEALTH_THRESHOLD_CRIT || C.sleeping)
+				CuffAttack(C, user)
+			else
+				user.visible_message("<span class='cultitalic'>This victim is still resisting!</span>")
 		else
 			user.visible_message("<span class='cultitalic'>This victim doesn't have enough arms to complete the restraint!</span>")
 			return
